@@ -1,5 +1,5 @@
 import * as React from 'react'
-import useMeasure, { Options as ResizeOptions } from 'react-use-measure'
+// import useMeasure, { Options as ResizeOptions } from 'react-use-measure'
 import { render, unmountComponentAtNode, RenderProps } from './index'
 import { createPointerEvents } from './events'
 import { UseStore } from 'zustand'
@@ -11,7 +11,7 @@ export interface Props
     React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
   fallback?: React.ReactNode
-  resize?: ResizeOptions
+  size: { width: number; height: number }
   events?: (store: UseStore<RootState>) => EventManager<any>
 }
 
@@ -42,8 +42,11 @@ class ErrorBoundary extends React.Component<{ set: React.Dispatch<any> }, { erro
   }
 }
 
-export function Canvas({ children, fallback, tabIndex, resize, id, style, className, events, ...props }: Props) {
-  const [ref, size] = useMeasure({ scroll: true, debounce: { scroll: 50, resize: 0 }, ...resize })
+export const Canvas = React.forwardRef<HTMLDivElement, Props>(function Canvas(
+  { children, fallback, tabIndex, id, style, className, events, size, ...props },
+  ref,
+) {
+  // const [ref, size] = useMeasure({ scroll: true, debounce: { scroll: 50, resize: 0 }, ...resize })
   const canvas = React.useRef<HTMLCanvasElement>(null!)
   const [block, setBlock] = React.useState<SetBlock>(false)
   const [error, setError] = React.useState<any>(false)
@@ -82,4 +85,4 @@ export function Canvas({ children, fallback, tabIndex, resize, id, style, classN
       </canvas>
     </div>
   )
-}
+})

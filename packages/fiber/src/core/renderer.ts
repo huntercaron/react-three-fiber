@@ -1,5 +1,7 @@
 import * as THREE from 'three'
-import Reconciler from 'react-reconciler'
+// import Reconciler from 'react-reconciler'
+// @ts-ignore
+import Reconciler from 'react-reconciler/cjs/react-reconciler.production.min'
 import { UseStore } from 'zustand'
 import { unstable_now as now, unstable_IdlePriority as idlePriority, unstable_runWithPriority as run } from 'scheduler'
 import { is } from './is'
@@ -61,7 +63,7 @@ const getContainer = (container: UseStore<RootState> | Instance, child: Instance
   // outside react, in which case we must take the root of the child that is about to be attached to it.
   root: isStore(container) ? container : container.__r3f?.root ?? child.__r3f.root,
   // The container is the eventual target into which objects are mounted, it has to be a THREE.Object3D
-  container: isStore(container) ? (container.getState().scene as unknown as Instance) : container,
+  container: isStore(container) ? ((container.getState().scene as unknown) as Instance) : container,
 })
 
 const DEFAULT = '__default'
@@ -73,10 +75,10 @@ let extend = (objects: object): void => void (catalogue = { ...catalogue, ...obj
 
 // Each object in the scene carries a small LocalState descriptor
 function prepare<T = THREE.Object3D>(object: T, state?: Partial<LocalState>) {
-  const instance = object as unknown as Instance
+  const instance = (object as unknown) as Instance
   if (state?.instance || !instance.__r3f) {
     instance.__r3f = {
-      root: null as unknown as UseStore<RootState>,
+      root: (null as unknown) as UseStore<RootState>,
       memoizedProps: {},
       objects: [],
       ...state,
@@ -255,14 +257,14 @@ function createRenderer<TCanvas>(roots: Map<TCanvas, Root>) {
       // Preemptively delete the instance from the containers interaction
       if (accumulative && root && instance.raycast && localState.handlers) {
         localState.handlers = undefined
-        const index = rootState.internal.interaction.indexOf(instance as unknown as THREE.Object3D)
+        const index = rootState.internal.interaction.indexOf((instance as unknown) as THREE.Object3D)
         if (index > -1) rootState.internal.interaction.splice(index, 1)
       }
 
       // Prep interaction handlers
       if (handlers.length) {
         if (accumulative && root && instance.raycast) {
-          rootState.internal.interaction.push(instance as unknown as THREE.Object3D)
+          rootState.internal.interaction.push((instance as unknown) as THREE.Object3D)
         }
         // Add handlers to the instances handler-map
         localState.handlers = handlers.reduce((acc, key) => ({ ...acc, [key]: newProps[key] }), {} as EventHandlers)
@@ -423,7 +425,7 @@ function createRenderer<TCanvas>(roots: Map<TCanvas, Root>) {
         parentInstance.remove(child)
         // Remove interactivity
         if (child.__r3f?.root) {
-          removeInteractivity(child.__r3f.root, child as unknown as THREE.Object3D)
+          removeInteractivity(child.__r3f.root, (child as unknown) as THREE.Object3D)
         }
       }
 
@@ -601,7 +603,7 @@ function createRenderer<TCanvas>(roots: Map<TCanvas, Root>) {
       // https://github.com/facebook/react/issues/20271
       // This will make sure events are only added once to the central container
       if (instance.raycast && instance.__r3f.handlers)
-        instance.__r3f.root.getState().internal.interaction.push(instance as unknown as THREE.Object3D)
+        instance.__r3f.root.getState().internal.interaction.push((instance as unknown) as THREE.Object3D)
     },
     prepareUpdate() {
       return EMPTY
